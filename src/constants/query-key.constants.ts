@@ -1,0 +1,4 @@
+export const QUERY_KEY = {
+  GET_SUMMARIES: "GET_SUMMARIES",
+  GET_SUMMARY: "GET_SUMMARY",
+};
