@@ -23,9 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <InitColorSchemeScript attribute="class" />
+        <InitColorSchemeScript attribute="class" defaultMode="light" />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={theme} defaultMode="light">
             <CssBaseline />
             <ReactQueryProvider>
               <ToastProvider>
