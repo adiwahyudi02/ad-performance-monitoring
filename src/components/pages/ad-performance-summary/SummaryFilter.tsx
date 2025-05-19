@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -30,6 +30,30 @@ export const SummaryFilter: React.FC = () => {
     onToggleStatus,
   } = useSummaryContext();
 
+  const [searchInput, setSearchInput] = useState(search);
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+  const debounceTime = 500;
+
+  const handleSearchDebounce = (value: string) => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+
+    timeoutId.current = setTimeout(() => {
+      onChangeFilter("search", value);
+    }, debounceTime);
+  };
+
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    handleSearchDebounce(value);
+  };
+
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
   return (
     <Box
       display="flex"
@@ -50,8 +74,8 @@ export const SummaryFilter: React.FC = () => {
           <TextField
             name="search"
             placeholder="Search by client name"
-            value={search}
-            onChange={(e) => onChangeFilter("search", e.target.value)}
+            value={searchInput}
+            onChange={handleSearch}
             slotProps={{
               input: {
                 startAdornment: (
@@ -59,7 +83,7 @@ export const SummaryFilter: React.FC = () => {
                     <SearchIcon />
                   </InputAdornment>
                 ),
-                endAdornment: search ? (
+                endAdornment: searchInput ? (
                   <InputAdornment
                     position="end"
                     sx={{ cursor: "pointer" }}

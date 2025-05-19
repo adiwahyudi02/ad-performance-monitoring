@@ -5,6 +5,7 @@ import { Summaries } from "@/api/schemas/summary.schemas";
 import { useGetSummariesQuery } from "@/hooks/queries/useGetSummariesQuery";
 import { formatDate } from "@/utils/date.utils";
 import { KpiTypes } from "@/types/kpi";
+import { useEventTrackingContext } from "./event-tracking.context";
 
 interface FilterState {
   search: string;
@@ -43,6 +44,8 @@ export const SummaryProvider: React.FC<{ children: React.ReactNode }> = ({
     rowsPerPage: 5,
   });
 
+  const { addEventTracking } = useEventTrackingContext();
+
   const mapStatusToIsFulfilled = (status: string[]): boolean | undefined => {
     if (status.length === 0 || status.length === 2) return undefined;
     return status.includes("fulfilled") ? true : false;
@@ -69,11 +72,26 @@ export const SummaryProvider: React.FC<{ children: React.ReactNode }> = ({
     key: K,
     value: FilterState[K]
   ) => {
-    setFilterState((prev) => ({
-      ...prev,
-      page: key === "page" || key === "rowsPerPage" ? prev.page : 0, // Reset page unless page/rowsPerPage change
-      [key]: value,
-    }));
+    setFilterState((prev) => {
+      const newState = {
+        ...prev,
+        page: key === "page" || key === "rowsPerPage" ? prev.page : 0,
+        [key]: value,
+      };
+
+      // Track event
+      addEventTracking({
+        type: "filter",
+        timestamp: Date.now(),
+        value: {
+          key,
+          value,
+          previousValue: prev[key],
+        },
+      });
+
+      return newState;
+    });
   };
 
   const onToggleStatus = (statusValue: string) => {
@@ -81,9 +99,21 @@ export const SummaryProvider: React.FC<{ children: React.ReactNode }> = ({
       const updatedStatus = prev.status.includes(statusValue)
         ? prev.status.filter((s) => s !== statusValue)
         : [...prev.status, statusValue];
+
+      // Track event
+      addEventTracking({
+        type: "filter",
+        timestamp: Date.now(),
+        value: {
+          key: "status",
+          value: updatedStatus,
+          previousValue: prev.status,
+        },
+      });
+
       return {
         ...prev,
-        page: 0, // Reset page when filter changes
+        page: 0,
         status: updatedStatus,
       };
     });

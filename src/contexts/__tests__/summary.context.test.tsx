@@ -9,6 +9,7 @@ jest.mock("@/hooks/queries/useGetSummariesQuery", () => ({
 }));
 
 import { useGetSummariesQuery } from "@/hooks/queries/useGetSummariesQuery";
+import { EventTrackingProvider } from "../event-tracking.context";
 
 const mockUseGetSummariesQuery = useGetSummariesQuery as jest.Mock;
 
@@ -61,9 +62,11 @@ describe("SummaryProvider", () => {
 
   test("provides default context values and renders children", () => {
     render(
-      <SummaryProvider>
-        <TestComponent />
-      </SummaryProvider>
+      <EventTrackingProvider>
+        <SummaryProvider>
+          <TestComponent />
+        </SummaryProvider>
+      </EventTrackingProvider>
     );
 
     expect(screen.getByTestId("search")).toHaveTextContent("");
@@ -79,9 +82,11 @@ describe("SummaryProvider", () => {
 
   test("onChangeFilter updates filter and resets page if key !== page or rowsPerPage", () => {
     render(
-      <SummaryProvider>
-        <TestComponent />
-      </SummaryProvider>
+      <EventTrackingProvider>
+        <SummaryProvider>
+          <TestComponent />
+        </SummaryProvider>
+      </EventTrackingProvider>
     );
 
     // Initially page is 0
@@ -98,9 +103,11 @@ describe("SummaryProvider", () => {
 
   test("onToggleStatus toggles status and resets page", () => {
     render(
-      <SummaryProvider>
-        <TestComponent />
-      </SummaryProvider>
+      <EventTrackingProvider>
+        <SummaryProvider>
+          <TestComponent />
+        </SummaryProvider>
+      </EventTrackingProvider>
     );
 
     // Status initially includes "fulfilled"

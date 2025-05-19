@@ -12,7 +12,7 @@ dayjs.extend(customParseFormat);
  * @returns The formatted date string. Returns an empty string if input is null/invalid.
  */
 export const formatDate = (
-  date: string | Date | null,
+  date: string | number | Date | null,
   format = "MMM D, YYYY",
   inputFormat?: string
 ): string => {

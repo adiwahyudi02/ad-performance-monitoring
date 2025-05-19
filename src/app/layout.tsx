@@ -8,6 +8,8 @@ import { ToastProvider } from "@/contexts/toast.context";
 import { DasboardLayout } from "@/components/layouts/dashboard-layout";
 import { ReactQueryProvider } from "@/providers/react-query.provider";
 import { APP_NAME } from "@/constants/app.constants";
+import { NavigationTracker } from "@/components/ui/navigation-tracker";
+import { EventTrackingProvider } from "@/contexts/event-tracking.context";
 
 export const metadata: Metadata = {
   title: `${APP_NAME} | Adi Wahyudi`,
@@ -29,7 +31,12 @@ export default function RootLayout({
             <CssBaseline />
             <ReactQueryProvider>
               <ToastProvider>
-                <DasboardLayout>{children}</DasboardLayout>
+                <DasboardLayout>
+                  <EventTrackingProvider>
+                    <NavigationTracker />
+                    {children}
+                  </EventTrackingProvider>
+                </DasboardLayout>
               </ToastProvider>
             </ReactQueryProvider>
           </ThemeProvider>

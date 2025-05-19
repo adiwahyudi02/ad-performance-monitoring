@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SummaryFilter } from "../SummaryFilter";
 
 // Mock the context hook
@@ -21,9 +21,15 @@ jest.mock("@/contexts/summary.context", () => ({
 }));
 
 describe("SummaryFilter", () => {
+  jest.useFakeTimers();
+
   beforeEach(() => {
     jest.clearAllMocks();
     render(<SummaryFilter />);
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   it("renders search input with initial value", () => {
@@ -32,16 +38,27 @@ describe("SummaryFilter", () => {
     expect(searchInput).toHaveValue("initial search");
   });
 
-  it("calls onChangeFilter when typing in search input", () => {
+  it("calls onChangeFilter when typing in search input", async () => {
     const searchInput = screen.getByPlaceholderText("Search by client name");
     fireEvent.change(searchInput, { target: { value: "new search" } });
-    expect(mockOnChangeFilter).toHaveBeenCalledWith("search", "new search");
+
+    // advance timers to trigger debounce
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(mockOnChangeFilter).toHaveBeenCalledWith("search", "new search");
+    });
   });
 
-  it("calls onChangeFilter with empty string when clear icon clicked", () => {
+  it("calls onChangeFilter with empty string when clear icon clicked", async () => {
     const clearIcon = screen.getByTestId("clear-icon");
     fireEvent.click(clearIcon);
-    expect(mockOnChangeFilter).toHaveBeenCalledWith("search", "");
+    // advance timers to trigger debounce
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(mockOnChangeFilter).toHaveBeenCalledWith("search", "");
+    });
   });
 
   it("renders select with initial KPI value", () => {
